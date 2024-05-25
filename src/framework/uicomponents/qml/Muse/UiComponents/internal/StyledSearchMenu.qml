@@ -128,7 +128,7 @@ MenuView {
         }
 
         property NavigationPanel navigationPanel: NavigationPanel {
-            name: "StyledMenu"
+            name: "StyledSearchMenu"
             section: content.navigationSection
             direction: NavigationPanel.Vertical
             order: 1
