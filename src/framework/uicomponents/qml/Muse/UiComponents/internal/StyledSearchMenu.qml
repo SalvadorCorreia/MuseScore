@@ -31,6 +31,10 @@ MenuView {
     id: root
 
     property alias model: view.model
+    //property AbstractScoresModel modelFilter
+
+    property alias searchText: searchField.searchText
+    property alias searching: searchField.hasText
 
     property int preferredAlign: Qt.AlignRight // Left, HCenter, Right
 
@@ -78,8 +82,9 @@ MenuView {
 
         root.contentWidth = root.menuMetrics.itemWidth
         root.contentHeight = Math.min(itemHeight * itemsCount + sepCount * prv.separatorHeight +
-                                      prv.viewVerticalMargin * 2, anchorItemHeight - padding * 2)
-
+                                      prv.viewVerticalMargin * 2 + searchField.height, 
+                                      anchorItemHeight - padding * 2 + searchField.height)
+    
         x = 0
         y = parent.height
     }
@@ -93,6 +98,21 @@ MenuView {
             root.subMenuLoader.close()
         }
     }
+
+    /*SortFilterProxyModel {
+        id: searchFilterModel
+        sourceModel: root.modelFilter
+
+        alwaysExcludeIndices: root.modelFilter.nonScoreItemIndices
+
+        filters: [
+            FilterValue {
+                roleName: "name"
+                roleValue: searchText
+                compareType: CompareType.Contains
+            }
+        ]
+    }*/
 
     property var subMenuLoader: null
     property MenuMetrics menuMetrics: null
@@ -177,7 +197,7 @@ MenuView {
         }
 
         Component.onCompleted: {
-            var menuLoaderComponent = Qt.createComponent("../StyledMenuLoader.qml");
+            var menuLoaderComponent = Qt.createComponent("../StyledSearchMenuLoader.qml");
             root.subMenuLoader = menuLoaderComponent.createObject(root)
             root.subMenuLoader.menuAnchorItem = root.anchorItem
 
@@ -199,11 +219,36 @@ MenuView {
             })
         }
 
+        SearchField {
+            id: searchField
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.topMargin: 0
+
+            navigation.name: "Search"
+            navigation.panel: navSearchPanel
+            navigation.order: 1
+
+            width: parent.width
+            
+            /* TODO IMPLEMENT
+            onSearchTextChanged: {
+                
+            }*/
+
+            clearTextButtonVisible: searching
+
+            onTextCleared: {
+                root.endSearch()
+            }
+        }
+
         StyledListView {
             id: view
 
             anchors.fill: parent
-            anchors.topMargin: prv.viewVerticalMargin
+            anchors.topMargin: prv.viewVerticalMargin + searchField.height
             anchors.bottomMargin: prv.viewVerticalMargin
 
             spacing: 0
