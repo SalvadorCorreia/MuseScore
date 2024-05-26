@@ -55,7 +55,7 @@ Loader {
     sourceComponent: StyledSearchMenu {
         id: itemMenu
 
-        openPolicies: PopupView.NoActivateFocus
+        openPolicies: PopupView.ActivateFocus
 
         onHandleMenuItem: function(itemId) {
             itemMenu.close()
