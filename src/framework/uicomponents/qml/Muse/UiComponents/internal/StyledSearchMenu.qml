@@ -224,21 +224,31 @@ MenuView {
 
             anchors.top: parent.top
             anchors.left: parent.left
-            anchors.topMargin: 0
+            anchors.topMargin: 2.5
+            anchors.leftMargin: 2.5
+            width: parent.width - 5
+            height: searchField.height - 5
+            
+            Rectangle {
+                width: parent.parent.width
+                height: 0.1
+                color: ui.theme.strokeColor
+                anchors.left: parent.left
+                anchors.top: parent.bottom
+                anchors.leftMargin: -2.5
+                anchors.topMargin: 2.5
+
+            }
 
             navigation.name: "Search"
             navigation.panel: content.navigationPanel
             navigation.row: 0
 
-            width: parent.width
-            
-            /* TODO IMPLEMENT
             onSearchTextChanged: {
-                
-            }*/
+                searchText = text
+            }
 
             clearTextButtonVisible: searching
-
             onTextCleared: {
                 root.endSearch()
             }
