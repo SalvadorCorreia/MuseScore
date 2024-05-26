@@ -197,7 +197,7 @@ MenuView {
         }
 
         Component.onCompleted: {
-            var menuLoaderComponent = Qt.createComponent("../StyledSearchMenuLoader.qml");
+            var menuLoaderComponent = Qt.createComponent("../StyledMenuLoader.qml");
             root.subMenuLoader = menuLoaderComponent.createObject(root)
             root.subMenuLoader.menuAnchorItem = root.anchorItem
 
@@ -227,8 +227,8 @@ MenuView {
             anchors.topMargin: 0
 
             navigation.name: "Search"
-            navigation.panel: navSearchPanel
-            navigation.order: 1
+            navigation.panel: content.navigationPanel
+            navigation.row: 0
 
             width: parent.width
             
@@ -323,7 +323,7 @@ MenuView {
                         parentWindow: root.window
 
                         navigation.panel: content.navigationPanel
-                        navigation.row: model.index
+                        navigation.row: model.index + 1
 
                         iconAndCheckMarkMode: Boolean(root.menuMetrics) ? root.menuMetrics.iconAndCheckMarkMode : StyledMenuItem.None
 
