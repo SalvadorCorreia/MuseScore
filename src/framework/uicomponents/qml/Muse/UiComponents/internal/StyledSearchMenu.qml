@@ -64,10 +64,14 @@ MenuView {
         //  (by default, the delegate height is taken as the menu item height).
         //  Let's manually adjust the height of the content
         var sepCount = 0
+        var filteredCount = 0
         for (let i = 0; i < model.length; i++) {
             let item = Boolean(model.get) ? model.get(i).itemRole : model[i]
             if (!Boolean(item.title)) {
                 sepCount++
+            }
+            else if (item.title.toLowerCase().indexOf(searchText.toLowerCase()) === -1) {
+                filteredCount++
             }
         }
 
@@ -76,7 +80,7 @@ MenuView {
             itemHeight = Math.max(itemHeight, view.contentItem.children[child].height)
         }
 
-        var itemsCount = model.length - sepCount
+        var itemsCount = model.length - sepCount - filteredCount
 
         var anchorItemHeight = root.anchorGeometry().height
 
@@ -197,7 +201,7 @@ MenuView {
         }
 
         Component.onCompleted: {
-            var menuLoaderComponent = Qt.createComponent("../StyledMenuLoader.qml");
+            var menuLoaderComponent = Qt.createComponent("../StyledSearchMenuLoader.qml");
             root.subMenuLoader = menuLoaderComponent.createObject(root)
             root.subMenuLoader.menuAnchorItem = root.anchorItem
 
@@ -245,12 +249,14 @@ MenuView {
             navigation.row: 0
 
             onSearchTextChanged: {
-                searchText = text
+                searchText = this.searchText
+                root.calculateSize()
             }
 
             clearTextButtonVisible: searching
             onTextCleared: {
-                root.endSearch()
+                searchText = this.searchText
+                root.calculateSize()
             }
         }
 
@@ -289,7 +295,6 @@ MenuView {
                         item.navigation.requestActive()
                         return true
                     }
-
                     return false
                 }
 
@@ -311,7 +316,11 @@ MenuView {
                 property var itemData: Boolean(root.model.get) ? model.itemRole : modelData
                 property bool isSeparator: !Boolean(itemData) || !Boolean(itemData.title) || itemData.title === ""
 
-                sourceComponent: isSeparator ? separatorComp : menuItemComp
+                function filterByTitle() {
+                    return itemData.title.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+                }
+
+                sourceComponent: isSeparator ? separatorComp : (filterByTitle() ? menuItemComp : filteredOutComp)
 
                 onLoaded: {
                     loader.item.modelData = Qt.binding(() => (itemData))
@@ -385,6 +394,16 @@ MenuView {
                         color: ui.theme.strokeColor
 
                         property var modelData
+                    }
+                }
+
+                Component {
+                    id: filteredOutComp
+
+                    Item {
+                        // This item does nothing and doesn't occupy space
+                        width: 0
+                        height: 0
                     }
                 }
             }
